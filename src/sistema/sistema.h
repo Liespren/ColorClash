@@ -1,19 +1,18 @@
 #pragma once
-
 #include <iostream>
+#include "../casilla/casilla.h"
 using namespace std;
 
 class Sistema {
-
 private:
-    //Jugador jugador;
     int turnoActual;
     int maxTurnos;
-    
+    Casilla tablero[5][5];
+
 public:
-    Sistema();
+    Sistema(); 
     void imprimirIniciarSistema();
     void iniciarJuego();
     void ejecutarTurno();
-    bool juegoTerminado() const;
+    bool juegoTerminado();
 };

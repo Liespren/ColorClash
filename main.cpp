@@ -1,5 +1,7 @@
 #include <iostream>
 #include "src/sistema/sistema.h"
+#include "src/sistema/sistema.h"
+
 
 using namespace std;
 
@@ -20,3 +22,4 @@ int main() {
 
     return 0;
 }
+
