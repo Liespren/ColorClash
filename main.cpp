@@ -1,24 +1,12 @@
-#include <iostream>
 #include "src/sistema/sistema.h"
 
-
-using namespace std;
-
 int main() {
-    cout << "Abriendo programa" << endl;
+    Sistema juego;
+    juego.iniciarJuego();
 
-    Sistema sistema;
-
-    sistema.imprimirIniciarSistema();
-    sistema.iniciarJuego();
-
-    while (!sistema.juegoTerminado()) {
-        sistema.ejecutarTurno();
+    while (!juego.juegoTerminado()) {
+        juego.ejecutarTurno();
     }
-
-    cout << "Juego terminado." << endl;
-    cout << "Cerrando programa" << endl;
 
     return 0;
 }
-

@@ -1,6 +1,8 @@
 #pragma once
+
 #include "../casilla/casilla.h"
 #include "../jugador/jugador.h"
+#include <iostream>
 
 class Sistema {
 private:
@@ -13,8 +15,13 @@ private:
 public:
     Sistema();
 
-    void imprimirIniciarSistema();
     void iniciarJuego();
     void ejecutarTurno();
+    void ejecutarAccionesJugador(Jugador& jugador);
+    void imprimirEstadoTablero();
+    
+    bool moverJugador(Jugador& jugador, char dir);
+    bool pintarCasilla(Jugador& jugador, char dir);
+    
     bool juegoTerminado() const;
 };

@@ -1,9 +1,9 @@
 #include "jugador.h"
 
-Jugador::Jugador() : nombre(""), color(""), casillasControladas(0) {}
+Jugador::Jugador() : nombre(""), color("blanco"), casillasControladas(0), acciones(2) {}
 
 Jugador::Jugador(const string& nombre, const string& color)
-    : nombre(nombre), color(color), casillasControladas(0) {}
+    : nombre(nombre), color(color), casillasControladas(0), acciones(2) {}
 
 string Jugador::getNombre() const {
     return nombre;
@@ -17,6 +17,10 @@ int Jugador::getCasillasControladas() const {
     return casillasControladas;
 }
 
+int Jugador::getAcciones() const {
+    return acciones;
+}
+
 void Jugador::setNombre(const string& nuevoNombre) {
     nombre = nuevoNombre;
 }
@@ -26,5 +30,18 @@ void Jugador::setColor(const string& nuevoColor) {
 }
 
 void Jugador::incrementarCasillas() {
-    casillasControladas++;
+    ++casillasControladas;
+}
+
+void Jugador::setAcciones(int nuevasAcciones) {
+    acciones = nuevasAcciones;
+}
+
+void Jugador::usarAccion() {
+    if (acciones > 0)
+        --acciones;
+}
+
+bool Jugador::tieneAcciones() const {
+    return acciones > 0;
 }

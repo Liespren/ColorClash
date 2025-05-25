@@ -2,17 +2,16 @@
 #include <iostream>
 using namespace std;
 
+// Constructor: inicializa tablero, jugadores y conecta punteros
 Sistema::Sistema()
-    : turnoActual(1), maxTurnos(10), jugador1("Jugador 1", "rojo"), jugador2("Jugador 2", "azul")
+    : turnoActual(1), maxTurnos(2), jugador1("R", "rojo"), jugador2("A", "azul")
 {
-    // Inicializa cada casilla del tablero con color blanco y sin jugador
-    for (int i = 0; i < 5; ++i) {
-        for (int j = 0; j < 5; ++j) {
+    // Inicializar tablero con casillas blancas sin jugadores
+    for (int i = 0; i < 5; ++i)
+        for (int j = 0; j < 5; ++j)
             tablero[i][j] = Casilla("blanco", nullptr);
-        }
-    }
 
-    // Conecta punteros (nexos) entre casillas
+    // Conectar punteros (nexos) entre casillas
     for (int i = 0; i < 5; ++i) {
         for (int j = 0; j < 5; ++j) {
             if (i > 0)
@@ -26,27 +25,21 @@ Sistema::Sistema()
         }
     }
 
-    // Asigna jugador 1 a la casilla (0,0)
+    // Asignar posiciones iniciales a jugadores
     tablero[0][0].setJugador(&jugador1);
     tablero[0][0].setColor(jugador1.getColor());
 
-    // Asigna jugador 2 a la casilla (4,4)
     tablero[4][4].setJugador(&jugador2);
     tablero[4][4].setColor(jugador2.getColor());
 }
 
-void Sistema::imprimirIniciarSistema() {
-    cout << "¡Bienvenido a ColorClash!" << endl;
-}
-
 void Sistema::iniciarJuego() {
     cout << "Iniciando juego..." << endl;
-    // Puedes agregar lógica adicional aquí si es necesario
+    imprimirEstadoTablero();
 }
 
-void Sistema::ejecutarTurno() {
-    cout << "\nTurno " << turnoActual << " del jugador." << endl;
-    cout << "Estado del tablero:" << endl;
+void Sistema::imprimirEstadoTablero() {
+    cout << "Tablero:" << endl;
 
     for (int i = 0; i < 5; ++i) {
         for (int j = 0; j < 5; ++j) {
@@ -62,8 +55,140 @@ void Sistema::ejecutarTurno() {
         }
         cout << endl;
     }
+}
+
+void Sistema::ejecutarTurno() {
+    cout << "\nTurno " << turnoActual << endl;
+
+    // Ejecutar acciones para jugador1 y jugador2, alternando turnos si quieres
+    ejecutarAccionesJugador(jugador1);
+    ejecutarAccionesJugador(jugador2);
+
+    // Imprimir el estado actual del tablero
+    imprimirEstadoTablero();
 
     turnoActual++;
+}
+
+void Sistema::ejecutarAccionesJugador(Jugador& jugador) {
+    jugador.setAcciones(2);
+
+    cout << "\nTurno de " << jugador.getNombre() << endl;
+
+    while (jugador.getAcciones() > 0) {
+        cout << "Acciones restantes: " << jugador.getAcciones() << endl;
+        cout << "1) Mover\n2) Pintar\nElige accion: ";
+        string accion;
+        cin >> accion;
+
+        char dir = ' ';
+        if (accion == "1" || accion == "2") {
+            cout << "Elige direccion (W=Arriba, S=Abajo, A=Izquierda, D=Derecha): ";
+            char opcion;
+            cin >> opcion;
+            opcion = tolower(opcion);
+
+            switch (opcion) {
+                case 'w': dir = 'U'; break;
+                case 's': dir = 'D'; break;
+                case 'a': dir = 'L'; break;
+                case 'd': dir = 'R'; break;
+                default:
+                    cout << "Direccion invalida. Intenta de nuevo.\n";
+                    continue;
+            }
+        } else {
+            cout << "Accion invalida. Intenta de nuevo.\n";
+            continue;
+        }
+
+        bool exito = false;
+        if (accion == "1") {
+            exito = moverJugador(jugador, dir);
+        } else if (accion == "2") {
+            exito = pintarCasilla(jugador, dir);
+        }
+
+        if (exito) {
+            jugador.setAcciones(jugador.getAcciones() - 1);
+        } else {
+            cout << "No se pudo realizar la accion. Intenta otra vez.\n";
+        }
+    }
+}
+
+bool Sistema::moverJugador(Jugador& jugador, char dir) {
+    // Encontrar la casilla actual del jugador
+    Casilla* casillaActual = nullptr;
+    for (int i = 0; i < 5; ++i)
+        for (int j = 0; j < 5; ++j)
+            if (tablero[i][j].getJugador() == &jugador)
+                casillaActual = &tablero[i][j];
+
+    if (!casillaActual) {
+        cout << "Error: jugador no esta en el tablero.\n";
+        return false;
+    }
+
+    Casilla* destino = nullptr;
+    switch (dir) {
+        case 'U': destino = casillaActual->getPtrU(); break;
+        case 'D': destino = casillaActual->getPtrD(); break;
+        case 'L': destino = casillaActual->getPtrL(); break;
+        case 'R': destino = casillaActual->getPtrR(); break;
+        default: return false;
+    }
+
+    if (destino == nullptr) {
+        cout << "No se puede mover en esa direccion (fuera del tablero).\n";
+        return false;
+    }
+
+    if (destino->getJugador() != nullptr) {
+        cout << "Casilla ocupada, no se puede mover ahi.\n";
+        return false;
+    }
+
+    // Mover jugador
+    destino->setJugador(&jugador);
+    destino->setColor(jugador.getColor());
+    casillaActual->setJugador(nullptr);
+    casillaActual->setColor("blanco");
+
+    cout << "Jugador movido correctamente.\n";
+    return true;
+}
+
+bool Sistema::pintarCasilla(Jugador& jugador, char dir) {
+    // Encontrar la casilla actual del jugador
+    Casilla* casillaActual = nullptr;
+    for (int i = 0; i < 5; ++i)
+        for (int j = 0; j < 5; ++j)
+            if (tablero[i][j].getJugador() == &jugador)
+                casillaActual = &tablero[i][j];
+
+    if (!casillaActual) {
+        cout << "Error: jugador no esta en el tablero.\n";
+        return false;
+    }
+
+    Casilla* destino = nullptr;
+    switch (dir) {
+        case 'U': destino = casillaActual->getPtrU(); break;
+        case 'D': destino = casillaActual->getPtrD(); break;
+        case 'L': destino = casillaActual->getPtrL(); break;
+        case 'R': destino = casillaActual->getPtrR(); break;
+        default: return false;
+    }
+
+    if (destino == nullptr) {
+        cout << "No se puede pintar en esa direccion (fuera del tablero).\n";
+        return false;
+    }
+
+    destino->setColor(jugador.getColor());
+    cout << "Casilla pintada correctamente.\n";
+    return true;
 }
 
 bool Sistema::juegoTerminado() const {
