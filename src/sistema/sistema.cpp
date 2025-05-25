@@ -1,14 +1,14 @@
 #include "sistema.h"
-#include "../casilla/casilla.h"
 #include <iostream>
 using namespace std;
 
-// Constructor
-Sistema::Sistema() : turnoActual(1), maxTurnos(10) {
-    // Inicializa cada casilla del tablero con valores por defecto
+Sistema::Sistema()
+    : turnoActual(1), maxTurnos(10), jugador1("Jugador 1", "rojo"), jugador2("Jugador 2", "azul")
+{
+    // Inicializa cada casilla del tablero con color blanco y sin jugador
     for (int i = 0; i < 5; ++i) {
         for (int j = 0; j < 5; ++j) {
-            tablero[i][j] = Casilla("blanco", "ninguno");
+            tablero[i][j] = Casilla("blanco", nullptr);
         }
     }
 
@@ -25,27 +25,40 @@ Sistema::Sistema() : turnoActual(1), maxTurnos(10) {
                 tablero[i][j].setPtrR(&tablero[i][j + 1]);
         }
     }
+
+    // Asigna jugador 1 a la casilla (0,0)
+    tablero[0][0].setJugador(&jugador1);
+    tablero[0][0].setColor(jugador1.getColor());
+
+    // Asigna jugador 2 a la casilla (4,4)
+    tablero[4][4].setJugador(&jugador2);
+    tablero[4][4].setColor(jugador2.getColor());
 }
 
-// Muestra mensaje inicial
 void Sistema::imprimirIniciarSistema() {
     cout << "¡Bienvenido a ColorClash!" << endl;
 }
 
-// Inicializa el juego
 void Sistema::iniciarJuego() {
     cout << "Iniciando juego..." << endl;
-    // Podrías agregar lógica adicional aquí si lo necesitas
+    // Puedes agregar lógica adicional aquí si es necesario
 }
 
-// Ejecuta un turno y muestra el estado del tablero
 void Sistema::ejecutarTurno() {
     cout << "\nTurno " << turnoActual << " del jugador." << endl;
     cout << "Estado del tablero:" << endl;
 
     for (int i = 0; i < 5; ++i) {
         for (int j = 0; j < 5; ++j) {
-            cout << tablero[i][j].getColor() << "\t";
+            // Mostrar color
+            cout << tablero[i][j].getColor();
+
+            // Mostrar jugador si hay uno
+            Jugador* jugadorEnCasilla = tablero[i][j].getJugador();
+            if (jugadorEnCasilla != nullptr) {
+                cout << "(" << jugadorEnCasilla->getNombre() << ")";
+            }
+            cout << "\t";
         }
         cout << endl;
     }
@@ -53,7 +66,6 @@ void Sistema::ejecutarTurno() {
     turnoActual++;
 }
 
-// Verifica si el juego terminó
-bool Sistema::juegoTerminado() {
+bool Sistema::juegoTerminado() const {
     return turnoActual > maxTurnos;
 }
