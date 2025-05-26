@@ -177,7 +177,7 @@ void Sistema::ejecutarAccionesJugador(Jugador& jugador) {
                     Jugador* jugadorEnCasilla = casillaPintada->getJugador();
                     if (jugadorEnCasilla != nullptr && jugadorEnCasilla != &jugador) {
                         jugadorEnCasilla->incrementarPenalizaciones(1);
-                        cout << "¡El rival " << jugadorEnCasilla->getNombre()
+                        cout << "El rival " << jugadorEnCasilla->getNombre()
                              << " fue pintado en su casilla! Pierde 1 accion en su proximo turno.\n";
                     }
                 }
