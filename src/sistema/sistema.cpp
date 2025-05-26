@@ -114,6 +114,7 @@ void Sistema::ejecutarAccionesJugador(Jugador& jugador) {
         } else {
             cout << "No se pudo realizar la accion. Intenta otra vez.\n";
         }
+        cout << " " <<endl;
     }
 }
 
