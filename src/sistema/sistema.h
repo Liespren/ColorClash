@@ -22,6 +22,7 @@ public:
     
     bool moverJugador(Jugador& jugador, char dir);
     bool pintarCasilla(Jugador& jugador, char dir);
-    
+    Casilla* obtenerCasillaEnDireccion(Jugador& jugador, char dir);
+
     bool juegoTerminado() const;
 };

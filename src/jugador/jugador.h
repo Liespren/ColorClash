@@ -9,6 +9,7 @@ private:
     string color;
     int casillasControladas;
     int acciones;  
+    int penalizaciones = 0;
 
 public:
     Jugador();
@@ -25,5 +26,10 @@ public:
 
     void setAcciones(int nuevasAcciones); 
     void usarAccion();                    
-    bool tieneAcciones() const;          
+    bool tieneAcciones() const;      
+    
+    int getPenalizaciones() const;
+    void setPenalizaciones(int p);
+    void incrementarPenalizaciones(int p = 1);
+    void resetPenalizaciones();
 };

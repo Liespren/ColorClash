@@ -4,7 +4,7 @@ using namespace std;
 
 // Constructor: inicializa tablero, jugadores y conecta punteros
 Sistema::Sistema()
-    : turnoActual(1), maxTurnos(2), jugador1("R", "rojo"), jugador2("A", "azul")
+    : turnoActual(1), maxTurnos(5), jugador1("R", "rojo"), jugador2("A", "azul")
 {
     // Inicializar tablero con casillas blancas sin jugadores
     for (int i = 0; i < 5; ++i)
@@ -26,11 +26,11 @@ Sistema::Sistema()
     }
 
     // Asignar posiciones iniciales a jugadores
-    tablero[0][0].setJugador(&jugador1);
-    tablero[0][0].setColor(jugador1.getColor());
+    tablero[1][1].setJugador(&jugador1);
+    tablero[1][1].setColor(jugador1.getColor());
 
-    tablero[4][4].setJugador(&jugador2);
-    tablero[4][4].setColor(jugador2.getColor());
+    tablero[3][3].setJugador(&jugador2);
+    tablero[3][3].setColor(jugador2.getColor());
 }
 
 void Sistema::iniciarJuego() {
@@ -39,21 +39,49 @@ void Sistema::iniciarJuego() {
 }
 
 void Sistema::imprimirEstadoTablero() {
-    cout << "Tablero:" << endl;
+    cout << "\nTablero:\n";
+
+    int puntosRojo = 0;
+    int puntosAzul = 0;
 
     for (int i = 0; i < 5; ++i) {
         for (int j = 0; j < 5; ++j) {
-            // Mostrar color
-            cout << tablero[i][j].getColor();
+            string color = tablero[i][j].getColor();
 
-            // Mostrar jugador si hay uno
+            if (color == "rojo") puntosRojo++;
+            else if (color == "azul") puntosAzul++;
+
+            cout << color;
+
             Jugador* jugadorEnCasilla = tablero[i][j].getJugador();
             if (jugadorEnCasilla != nullptr) {
                 cout << "(" << jugadorEnCasilla->getNombre() << ")";
             }
+
             cout << "\t";
         }
         cout << endl;
+    }
+
+    cout << "\nPuntaje:\n";
+    cout << "Rojo (R): " << puntosRojo << " puntos\n";
+    cout << "Azul (A): " << puntosAzul << " puntos\n";
+
+    if (turnoActual >= maxTurnos) {
+        if (puntosRojo == puntosAzul) {
+            // Empate: damos un turno extra
+            cout << "\nEmpate! Se añade un turno adicional.\n";
+            maxTurnos++;  // Extiende el juego
+        } else {
+            // Anunciar ganador y finalizar
+            cout << "\n=== Juego terminado ===\n";
+
+            if (puntosRojo > puntosAzul) {
+                cout << "Jugador Rojo (R) gana!\n";
+            } else {
+                cout << "Jugador Azul (A) gana!\n";
+            }
+        }
     }
 }
 
@@ -71,7 +99,14 @@ void Sistema::ejecutarTurno() {
 }
 
 void Sistema::ejecutarAccionesJugador(Jugador& jugador) {
-    jugador.setAcciones(2);
+    // Aplicar penalización si corresponde
+    if (jugador.getPenalizaciones() > 0) {
+        cout << jugador.getNombre() << " tiene una penalizacion y pierde 1 accion este turno.\n";
+        jugador.setAcciones(1);
+        jugador.setPenalizaciones(0);
+    } else {
+        jugador.setAcciones(2);
+    }
 
     cout << "\nTurno de " << jugador.getNombre() << endl;
 
@@ -83,7 +118,7 @@ void Sistema::ejecutarAccionesJugador(Jugador& jugador) {
 
         char dir = ' ';
         if (accion == "1" || accion == "2") {
-            cout << "Elige direccion (W=Arriba, S=Abajo, A=Izquierda, D=Derecha): ";
+            cout << "Elige direccion (WASD): ";
             char opcion;
             cin >> opcion;
             opcion = tolower(opcion);
@@ -107,6 +142,19 @@ void Sistema::ejecutarAccionesJugador(Jugador& jugador) {
             exito = moverJugador(jugador, dir);
         } else if (accion == "2") {
             exito = pintarCasilla(jugador, dir);
+
+            // Si la pintura fue exitosa, verificamos si hay un jugador en esa casilla
+            if (exito) {
+                Casilla* casillaPintada = obtenerCasillaEnDireccion(jugador, dir);
+                if (casillaPintada != nullptr) {
+                    Jugador* jugadorEnCasilla = casillaPintada->getJugador();
+                    if (jugadorEnCasilla != nullptr && jugadorEnCasilla != &jugador) {
+                        jugadorEnCasilla->incrementarPenalizaciones(1);
+                        cout << "¡El rival " << jugadorEnCasilla->getNombre()
+                             << " fue pintado en su casilla! Pierde 1 accion en su proximo turno.\n";
+                    }
+                }
+            }
         }
 
         if (exito) {
@@ -114,7 +162,7 @@ void Sistema::ejecutarAccionesJugador(Jugador& jugador) {
         } else {
             cout << "No se pudo realizar la accion. Intenta otra vez.\n";
         }
-        cout << " " <<endl;
+        cout << endl;
     }
 }
 
@@ -190,6 +238,46 @@ bool Sistema::pintarCasilla(Jugador& jugador, char dir) {
     destino->setColor(jugador.getColor());
     cout << "Casilla pintada correctamente.\n";
     return true;
+}
+
+Casilla* Sistema::obtenerCasillaEnDireccion(Jugador& jugador, char dir) {
+    int filaJugador = -1;
+    int colJugador = -1;
+
+    // Buscar la posición actual del jugador en el tablero
+    for (int i = 0; i < 5; ++i) {
+        for (int j = 0; j < 5; ++j) {
+            if (tablero[i][j].getJugador() == &jugador) {
+                filaJugador = i;
+                colJugador = j;
+                break;
+            }
+        }
+        if (filaJugador != -1) break;
+    }
+
+    if (filaJugador == -1 || colJugador == -1) {
+        return nullptr;  // No se encontró al jugador
+    }
+
+    // Calcular la dirección
+    int nuevaFila = filaJugador;
+    int nuevaCol = colJugador;
+
+    switch (dir) {
+        case 'U': nuevaFila -= 1; break;
+        case 'D': nuevaFila += 1; break;
+        case 'L': nuevaCol -= 1; break;
+        case 'R': nuevaCol += 1; break;
+        default: return nullptr;
+    }
+
+    // Validar límites del tablero
+    if (nuevaFila >= 0 && nuevaFila < 5 && nuevaCol >= 0 && nuevaCol < 5) {
+        return &tablero[nuevaFila][nuevaCol];
+    }
+
+    return nullptr;  // Dirección fuera de los límites
 }
 
 bool Sistema::juegoTerminado() const {

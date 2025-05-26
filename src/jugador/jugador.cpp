@@ -45,3 +45,19 @@ void Jugador::usarAccion() {
 bool Jugador::tieneAcciones() const {
     return acciones > 0;
 }
+
+int Jugador::getPenalizaciones() const {
+    return penalizaciones;
+}
+
+void Jugador::setPenalizaciones(int p) {
+    penalizaciones = p;
+}
+
+void Jugador::incrementarPenalizaciones(int p) {
+    penalizaciones += p;
+}
+
+void Jugador::resetPenalizaciones() {
+    penalizaciones = 0;
+}
