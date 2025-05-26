@@ -1,10 +1,17 @@
-#include "sistema.h"
 #include <iostream>
+#include "sistema.h"
+
+#ifdef _WIN32
+#include <windows.h>
+#ifndef ENABLE_VIRTUAL_TERMINAL_PROCESSING
+#define ENABLE_VIRTUAL_TERMINAL_PROCESSING 0x0004
+#endif
+#endif
 using namespace std;
 
 // Constructor: inicializa tablero, jugadores y conecta punteros
 Sistema::Sistema()
-    : turnoActual(1), maxTurnos(5), jugador1("R", "rojo"), jugador2("A", "azul")
+    : turnoActual(1), maxTurnos(2), jugador1("R", "rojo"), jugador2("A", "azul")
 {
     // Inicializar tablero con casillas blancas sin jugadores
     for (int i = 0; i < 5; ++i)
@@ -38,29 +45,53 @@ void Sistema::iniciarJuego() {
     imprimirEstadoTablero();
 }
 
+void Sistema::habilitarColoresANSI() {
+#ifdef _WIN32
+    HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
+    if (hOut != INVALID_HANDLE_VALUE) {
+        DWORD dwMode = 0;
+        if (GetConsoleMode(hOut, &dwMode)) {
+            dwMode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
+            SetConsoleMode(hOut, dwMode);
+        }
+    }
+#endif
+}
+
 void Sistema::imprimirEstadoTablero() {
-    cout << "\nTablero:\n";
+    habilitarColoresANSI();
 
     int puntosRojo = 0;
     int puntosAzul = 0;
 
+    cout << "\n    ";
+    for (int col = 0; col < 5; ++col) {
+        cout << col << "     ";
+    }
+    cout << "\n  +-----+-----+-----+-----+-----+\n";
+
     for (int i = 0; i < 5; ++i) {
+        cout << i << " |";
         for (int j = 0; j < 5; ++j) {
             string color = tablero[i][j].getColor();
-
             if (color == "rojo") puntosRojo++;
             else if (color == "azul") puntosAzul++;
 
-            cout << color;
-
             Jugador* jugadorEnCasilla = tablero[i][j].getJugador();
+            string contenido = "     ";
             if (jugadorEnCasilla != nullptr) {
-                cout << "(" << jugadorEnCasilla->getNombre() << ")";
+                contenido = "  " + jugadorEnCasilla->getNombre() + "  ";
             }
 
-            cout << "\t";
+            // Colorear fondo según el color de la casilla
+            if (color == "rojo")
+                cout << "\033[41m" << contenido << "\033[0m|";
+            else if (color == "azul")
+                cout << "\033[44m" << contenido << "\033[0m|";
+            else
+                cout << "\033[47m" << contenido << "\033[0m|";
         }
-        cout << endl;
+        cout << "\n  +-----+-----+-----+-----+-----+\n";
     }
 
     cout << "\nPuntaje:\n";
@@ -69,18 +100,14 @@ void Sistema::imprimirEstadoTablero() {
 
     if (turnoActual >= maxTurnos) {
         if (puntosRojo == puntosAzul) {
-            // Empate: damos un turno extra
             cout << "\nEmpate! Se añade un turno adicional.\n";
-            maxTurnos++;  // Extiende el juego
+            maxTurnos++;
         } else {
-            // Anunciar ganador y finalizar
             cout << "\n=== Juego terminado ===\n";
-
-            if (puntosRojo > puntosAzul) {
+            if (puntosRojo > puntosAzul)
                 cout << "Jugador Rojo (R) gana!\n";
-            } else {
+            else
                 cout << "Jugador Azul (A) gana!\n";
-            }
         }
     }
 }

@@ -15,6 +15,8 @@ private:
 public:
     Sistema();
 
+    void habilitarColoresANSI();
+
     void iniciarJuego();
     void ejecutarTurno();
     void ejecutarAccionesJugador(Jugador& jugador);
