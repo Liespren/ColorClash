@@ -20,7 +20,6 @@ Proyecto de Estructura de Datos
   - **Pintar**: una casilla adyacente (arriba, abajo, izquierda, derecha).
 - Si pintas la casilla donde está el otro jugador, **le quitas una acción en su siguiente turno**.  Esta penalización solo puede aplicarse **una vez por turno**.
 - Si hay un **empate** al final del juego, se añade **un turno adicional**.
-- La casilla en la que se encuentra tu personaje se considera automáticamente pintada de tu color, a menos que el jugador contrario pinte sobre ella.
 
 ---
 
@@ -28,7 +27,7 @@ Proyecto de Estructura de Datos
 
 - [ ] Implementación gráfica con SFML o SDL
 - [ ] Modo un jugador con arbol de decisiones
-- [ ] Personalización de tablero (nombre_jugador, tamaño, colores)
+- [ ] Personalización de tablero (nombre_jugador, tamaño, colores, cantidad_turnos)
 - [ ] Ver historial de jugadas previas
 
 ---

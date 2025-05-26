@@ -227,9 +227,7 @@ bool Sistema::moverJugador(Jugador& jugador, char dir) {
 
     // Mover jugador
     destino->setJugador(&jugador);
-    destino->setColor(jugador.getColor());
     casillaActual->setJugador(nullptr);
-    casillaActual->setColor("blanco");
 
     cout << "Jugador movido correctamente.\n";
     return true;
