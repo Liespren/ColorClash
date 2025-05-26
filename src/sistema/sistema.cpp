@@ -11,7 +11,7 @@ using namespace std;
 
 // Constructor: inicializa tablero, jugadores y conecta punteros
 Sistema::Sistema()
-    : turnoActual(1), maxTurnos(2), jugador1("R", "rojo"), jugador2("A", "azul")
+    : turnoActual(1), maxTurnos(5), jugador1("R", "rojo"), jugador2("A", "azul")
 {
     // Inicializar tablero con casillas blancas sin jugadores
     for (int i = 0; i < 5; ++i)
