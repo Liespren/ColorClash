@@ -85,11 +85,11 @@ void Sistema::imprimirEstadoTablero() {
 
             // Colorear fondo según el color de la casilla
             if (color == "rojo")
-                cout << "\033[41m" << contenido << "\033[0m|";
+                cout << "\033[30;41m" << contenido << "\033[0m|";  // texto negro, fondo rojo
             else if (color == "azul")
-                cout << "\033[44m" << contenido << "\033[0m|";
+                cout << "\033[30;44m" << contenido << "\033[0m|";  // texto negro, fondo azul
             else
-                cout << "\033[47m" << contenido << "\033[0m|";
+                cout << "\033[30;47m" << contenido << "\033[0m|";  // texto negro, fondo blanco
         }
         cout << "\n  +-----+-----+-----+-----+-----+\n";
     }
