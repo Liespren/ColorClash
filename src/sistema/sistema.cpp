@@ -117,7 +117,7 @@ void Sistema::ejecutarTurno() {
 
     // Ejecutar acciones para jugador1 y jugador2, alternando turnos si quieres
     ejecutarAccionesJugador(jugador1);
-    ejecutarAccionesJugador(jugador2);
+    ejecutarTurnoIA(jugador2);
 
     // Imprimir el estado actual del tablero
     imprimirEstadoTablero();
@@ -325,4 +325,30 @@ char Sistema::obtenerColorCasilla(int fila, int col) const {
     return ' ';  // Casilla sin color ni jugador
 }
 
+void Sistema::ejecutarTurnoIA(Jugador& jugador) {
+    cout << "\nTurno IA (" << jugador.getNombre() << ")" << endl;
+
+    // Inicializar acciones del jugador IA (2 acciones)
+    jugador.setAcciones(2);
+
+    // Acción 1: pintar casilla superior si es posible
+    if (jugador.getAcciones() > 0) {
+        if (pintarCasilla(jugador, 'U')) {  // 'U' = arriba
+            cout << "IA pintó la casilla superior.\n";
+            jugador.setAcciones(jugador.getAcciones() - 1);
+        } else {
+            cout << "IA no pudo pintar la casilla superior.\n";
+        }
+    }
+
+    // Acción 2: mover a la izquierda si es posible
+    if (jugador.getAcciones() > 0) {
+        if (moverJugador(jugador, 'L')) {  // 'L' = izquierda
+            cout << "IA se movió a la izquierda.\n";
+            jugador.setAcciones(jugador.getAcciones() - 1);
+        } else {
+            cout << "IA no pudo moverse a la izquierda.\n";
+        }
+    }
+}
 

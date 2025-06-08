@@ -28,5 +28,7 @@ public:
     Casilla* obtenerCasillaEnDireccion(Jugador& jugador, char dir);
     char obtenerColorCasilla(int fila, int col) const;
 
+    void ejecutarTurnoIA(Jugador& jugador);
+
     bool juegoTerminado() const;
 };
