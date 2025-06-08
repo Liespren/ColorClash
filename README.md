@@ -45,6 +45,9 @@ ColorClash/
 │   ├── casilla/
 │   │   ├── casilla.h
 │   │   └── casilla.cpp
+│   ├── ia/
+│   │   ├── ia.h
+│   │   └── ia.cpp
 │   └── jugador/
 │       ├── jugador.h
 │       └── jugador.cpp

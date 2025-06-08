@@ -308,3 +308,21 @@ Casilla* Sistema::obtenerCasillaEnDireccion(Jugador& jugador, char dir) {
 bool Sistema::juegoTerminado() const {
     return turnoActual > maxTurnos;
 }
+
+char Sistema::obtenerColorCasilla(int fila, int col) const {
+    Jugador* jugador = tablero[fila][col].getJugador();
+    if (jugador != nullptr) {
+        // Devuelve la primera letra del color del jugador (ejemplo: 'r' o 'a')
+        string colorJugador = jugador->getColor();
+        if (!colorJugador.empty())
+            return colorJugador[0];
+    }
+    // Si no hay jugador, devolver la primera letra del color de la casilla
+    string color = tablero[fila][col].getColor();
+    if (!color.empty())
+        return color[0];
+
+    return ' ';  // Casilla sin color ni jugador
+}
+
+
