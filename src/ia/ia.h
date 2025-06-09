@@ -1,27 +1,39 @@
 #pragma once
+
 #include <vector>
-#include <utility> // std::pair
-#include <string>
+#include <limits>
 
 using namespace std;
 
-struct MovimientoIA {
-    string direccion;
-    float puntaje;
-    vector<pair<int, int>> casillasParaPintar;
+const int NUM_FILAS = 5; 
+const int NUM_COLUMNAS = 5;
+
+struct Movimiento {
+    int fila;
+    int columna;
 };
 
-class Sistema;  // Forward declaration para evitar inclusión circular
+struct Estado {
+    int tablero[NUM_FILAS][NUM_COLUMNAS];
+    int jugador_actual;
+
+    Estado(int original[NUM_FILAS][NUM_COLUMNAS], int turno_actual);
+};
 
 class IA {
 public:
-    IA();
+    IA(int profundidad_maxima);
 
-    // Devuelve el mejor movimiento posible para la IA, dado su posición actual
-    MovimientoIA mejorMovimientoParaIA(int filaActual, int colActual, const Sistema& sistema);
+    Movimiento obtener_mejor_movimiento(int tablero[NUM_FILAS][NUM_COLUMNAS], int jugador);
 
 private:
-    // Funciones auxiliares (puedes agregar más según necesites)
-    vector<pair<int,int>> obtenerAdyacentes(int fila, int col, int maxFilas = 5, int maxCols = 5) const;
-    float evaluarCasillaParaIA(int fila, int col, const Sistema& sistema) const;
+    int profundidad;
+
+    int minimax(Estado estado, int profundidad_actual, int alpha, int beta, bool es_maximizador);
+
+    vector<Movimiento> generar_movimientos_validos(const Estado& estado);
+
+    Estado aplicar_movimiento(const Estado& estado, const Movimiento& mov);
+
+    int evaluar(const Estado& estado);
 };

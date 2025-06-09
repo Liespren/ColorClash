@@ -19,3 +19,10 @@ Casilla* Casilla::getPtrU() const { return ptrU; }
 Casilla* Casilla::getPtrD() const { return ptrD; }
 Casilla* Casilla::getPtrL() const { return ptrL; }
 Casilla* Casilla::getPtrR() const { return ptrR; }
+
+int Casilla::getJugadorId(const Jugador& jugador1, const Jugador& jugador2) const {
+    if (jugador == nullptr) return 0;
+    if (jugador == &jugador1) return 1;
+    if (jugador == &jugador2) return 2;
+    return -1; // Caso inesperado
+}

@@ -31,4 +31,7 @@ public:
     Casilla* getPtrD() const;
     Casilla* getPtrL() const;
     Casilla* getPtrR() const;
+
+    // para que IA pueda obtener un ID de jugador
+    int getJugadorId(const Jugador& jugador1, const Jugador& jugador2) const;
 };

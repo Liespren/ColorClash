@@ -1,73 +1,106 @@
-#include "ia.h"
-#include "../sistema/sistema.h"  // Incluye para acceder a Sistema
-#include <string>
+#include "IA.h"
 #include <algorithm>
 
-using namespace std;
-
-IA::IA() {}
-
-vector<pair<int,int>> IA::obtenerAdyacentes(int fila, int col, int maxFilas, int maxCols) const {
-    vector<pair<int,int>> adyacentes;
-    const int dx[] = {-1, 1, 0, 0};
-    const int dy[] = {0, 0, -1, 1};
-
-    for (int i = 0; i < 4; ++i) {
-        int nf = fila + dx[i];
-        int nc = col + dy[i];
-        if (nf >= 0 && nf < maxFilas && nc >= 0 && nc < maxCols) {
-            adyacentes.emplace_back(nf, nc);
+Estado::Estado(int original[NUM_FILAS][NUM_COLUMNAS], int turno_actual) {
+    jugador_actual = turno_actual;
+    for (int i = 0; i < NUM_FILAS; ++i) {
+        for (int j = 0; j < NUM_COLUMNAS; ++j) {
+            tablero[i][j] = original[i][j];
         }
     }
-    return adyacentes;
 }
 
-float IA::evaluarCasillaParaIA(int fila, int col, const Sistema& sistema) const {
-    // preferir casillas vacías o propias, penalizar casillas del oponente
-    // Aquí necesitas acceder a sistema.tablero para evaluar, pero si tablero es privado, crea un método público en Sistema para obtener info de casillas
-
-    // Supongamos que Sistema tiene un método: char obtenerColorCasilla(int fila, int col);
-    char color = sistema.obtenerColorCasilla(fila, col);
-
-    if (color == 'A') return 0.0f; // Ya pintado por IA (azul), no pintar
-    if (color == 'R') return -1.0f; // Pintado por rival, menos preferible
-    return 1.0f; // Casilla vacía, preferible
+IA::IA(int profundidad_maxima) {
+    profundidad = profundidad_maxima;
 }
 
-MovimientoIA IA::mejorMovimientoParaIA(int filaActual, int colActual, const Sistema& sistema) {
-    vector<string> direcciones = {"quieto", "arriba", "abajo", "izquierda", "derecha"};
-    const int dx[] = {0, -1, 1, 0, 0};
-    const int dy[] = {0, 0, 0, -1, 1};
+Movimiento IA::obtener_mejor_movimiento(int tablero[NUM_FILAS][NUM_COLUMNAS], int jugador) {
+    Estado estado_inicial(tablero, jugador);
+    Movimiento mejor_movimiento = {-1, -1};
+    int mejor_valor = numeric_limits<int>::min();
 
-    MovimientoIA mejorMovimiento = {"quieto", -1000.0f, {}};
+    for (Movimiento mov : generar_movimientos_validos(estado_inicial)) {
+        Estado nuevo_estado = aplicar_movimiento(estado_inicial, mov);
+        int valor = minimax(nuevo_estado, profundidad - 1, numeric_limits<int>::min(), numeric_limits<int>::max(), false);
+        if (valor > mejor_valor) {
+            mejor_valor = valor;
+            mejor_movimiento = mov;
+        }
+    }
+    return mejor_movimiento;
+}
 
-    for (int i = 0; i < 5; ++i) {
-        int nf = filaActual + dx[i];
-        int nc = colActual + dy[i];
+int IA::minimax(Estado estado, int profundidad_actual, int alpha, int beta, bool es_maximizador) {
+    if (profundidad_actual == 0 || generar_movimientos_validos(estado).empty()) {
+        return evaluar(estado);
+    }
 
-        // Si no es "quieto", validar límites
-        if (i != 0 && (nf < 0 || nf >= 5 || nc < 0 || nc >= 5)) continue;
+    if (es_maximizador) {
+        int max_eval = numeric_limits<int>::min();
+        for (Movimiento mov : generar_movimientos_validos(estado)) {
+            Estado nuevo_estado = aplicar_movimiento(estado, mov);
+            int eval = minimax(nuevo_estado, profundidad_actual - 1, alpha, beta, false);
+            max_eval = max(max_eval, eval);
+            alpha = max(alpha, eval);
+            if (beta <= alpha) break; // poda beta
+        }
+        return max_eval;
+    } else {
+        int min_eval = numeric_limits<int>::max();
+        for (Movimiento mov : generar_movimientos_validos(estado)) {
+            Estado nuevo_estado = aplicar_movimiento(estado, mov);
+            int eval = minimax(nuevo_estado, profundidad_actual - 1, alpha, beta, true);
+            min_eval = min(min_eval, eval);
+            beta = min(beta, eval);
+            if (beta <= alpha) break; // poda alfa
+        }
+        return min_eval;
+    }
+}
 
-        vector<pair<int,int>> adyacentes = obtenerAdyacentes(nf, nc);
+vector<Movimiento> IA::generar_movimientos_validos(const Estado& estado) {
+    vector<Movimiento> movimientos;
+    bool visitado[NUM_FILAS][NUM_COLUMNAS] = {false};
 
-        float puntajeTotal = 0.0f;
-        vector<pair<int,int>> casillasParaPintar;
-
-        for (auto& casilla : adyacentes) {
-            float p = evaluarCasillaParaIA(casilla.first, casilla.second, sistema);
-            if (p > 0) {  // Solo pintar casillas positivas
-                puntajeTotal += p;
-                casillasParaPintar.push_back(casilla);
-                if (casillasParaPintar.size() >= 2) break; // máximo 2 casillas para pintar
+    for (int i = 0; i < NUM_FILAS; ++i) {
+        for (int j = 0; j < NUM_COLUMNAS; ++j) {
+            if (estado.tablero[i][j] == estado.jugador_actual) {
+                // Revisar vecinos arriba, abajo, izquierda, derecha
+                const int dirs[4][2] = {{-1,0},{1,0},{0,-1},{0,1}};
+                for (auto& d : dirs) {
+                    int ni = i + d[0];
+                    int nj = j + d[1];
+                    if (ni >= 0 && ni < NUM_FILAS && nj >= 0 && nj < NUM_COLUMNAS) {
+                        if (estado.tablero[ni][nj] == 0 && !visitado[ni][nj]) {
+                            movimientos.push_back({ni, nj});
+                            visitado[ni][nj] = true;
+                        }
+                    }
+                }
             }
         }
+    }
+    return movimientos;
+}
 
-        if (puntajeTotal > mejorMovimiento.puntaje) {
-            mejorMovimiento.direccion = direcciones[i];
-            mejorMovimiento.puntaje = puntajeTotal;
-            mejorMovimiento.casillasParaPintar = casillasParaPintar;
+Estado IA::aplicar_movimiento(const Estado& estado, const Movimiento& mov) {
+    Estado nuevo_estado = estado;
+    nuevo_estado.tablero[mov.fila][mov.columna] = estado.jugador_actual;
+    nuevo_estado.jugador_actual = 3 - estado.jugador_actual; // alterna entre 1 y 2
+    return nuevo_estado;
+}
+
+int IA::evaluar(const Estado& estado) {
+    int puntaje_jugador = 0;
+    int puntaje_oponente = 0;
+
+    for (int i = 0; i < NUM_FILAS; ++i) {
+        for (int j = 0; j < NUM_COLUMNAS; ++j) {
+            if (estado.tablero[i][j] == estado.jugador_actual)
+                puntaje_jugador++;
+            else if (estado.tablero[i][j] != 0)
+                puntaje_oponente++;
         }
     }
-
-    return mejorMovimiento;
+    return puntaje_jugador - puntaje_oponente;
 }
