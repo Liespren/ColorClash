@@ -10,8 +10,12 @@
 using namespace std;
 
 // Constructor: inicializa tablero, jugadores y conecta punteros
-Sistema::Sistema()
-    : turnoActual(1), maxTurnos(5), jugador1("R", "rojo"), jugador2("A", "azul")
+Sistema::Sistema():
+    turnoActual(1), 
+    maxTurnos(5), 
+    jugador1("R", "rojo"), 
+    jugador2("A", "azul"),
+    ia(5)
 {
     // Inicializar tablero con casillas blancas sin jugadores
     for (int i = 0; i < 5; ++i)
@@ -327,6 +331,8 @@ char Sistema::obtenerColorCasilla(int fila, int col) const {
 
 void Sistema::ejecutarTurnoIA(Jugador& jugador) {
     cout << "\nTurno IA (" << jugador.getNombre() << ")" << endl;
+
+    //
 
     // Inicializar acciones del jugador IA (2 acciones)
     jugador.setAcciones(2);

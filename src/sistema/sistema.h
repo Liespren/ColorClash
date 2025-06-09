@@ -2,6 +2,7 @@
 
 #include "../casilla/casilla.h"
 #include "../jugador/jugador.h"
+#include "../ia/ia.h"
 #include <iostream>
 
 class Sistema {
@@ -11,6 +12,7 @@ private:
     int maxTurnos;
     Jugador jugador1;
     Jugador jugador2;
+    IA ia;
 
 public:
     Sistema();
