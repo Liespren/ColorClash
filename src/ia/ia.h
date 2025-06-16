@@ -11,6 +11,9 @@ const int NUM_COLUMNAS = 5;
 struct Movimiento {
     int fila;
     int columna;
+    bool es_pintura;  // true si es una acción de pintar, false si es mover
+
+    Movimiento(int f, int c, bool p = false) : fila(f), columna(c), es_pintura(p) {}
 };
 
 struct Estado {
@@ -18,6 +21,7 @@ struct Estado {
     int jugador_actual;
 
     Estado(int original[NUM_FILAS][NUM_COLUMNAS], int turno_actual);
+    Estado(const Estado& otro);  // Copy constructor
 };
 
 class IA {
@@ -36,4 +40,8 @@ private:
     Estado aplicar_movimiento(const Estado& estado, const Movimiento& mov);
 
     int evaluar(const Estado& estado);
+
+    bool es_movimiento_valido(const Estado& estado, const Movimiento& mov) const;
+
+    int evaluar_posicion_estrategica(int fila, int col) const;
 };

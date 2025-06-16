@@ -37,15 +37,6 @@ void Jugador::setAcciones(int nuevasAcciones) {
     acciones = nuevasAcciones;
 }
 
-void Jugador::usarAccion() {
-    if (acciones > 0)
-        --acciones;
-}
-
-bool Jugador::tieneAcciones() const {
-    return acciones > 0;
-}
-
 int Jugador::getPenalizaciones() const {
     return penalizaciones;
 }
@@ -56,8 +47,4 @@ void Jugador::setPenalizaciones(int p) {
 
 void Jugador::incrementarPenalizaciones(int p) {
     penalizaciones += p;
-}
-
-void Jugador::resetPenalizaciones() {
-    penalizaciones = 0;
 }

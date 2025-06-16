@@ -25,11 +25,8 @@ public:
     void incrementarCasillas();
 
     void setAcciones(int nuevasAcciones); 
-    void usarAccion();                    
-    bool tieneAcciones() const;      
     
     int getPenalizaciones() const;
     void setPenalizaciones(int p);
     void incrementarPenalizaciones(int p = 1);
-    void resetPenalizaciones();
 };
