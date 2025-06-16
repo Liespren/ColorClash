@@ -25,7 +25,7 @@ int main() {
 
             // Limpiar cualquier enter pendiente del flujo despues del juego
             cin.clear();
-            cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
         } else if (opcion == "2") {
             cout << "Saliendo del juego. Hasta luego.\n";
