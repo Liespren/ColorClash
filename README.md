@@ -19,7 +19,7 @@ Proyecto de Estructura de Datos
   - **Mover**: hacia una direccion (arriba, abajo, izquierda, derecha).
   - **Pintar**: una casilla adyacente (arriba, abajo, izquierda, derecha).
 - Si pintas la casilla donde esta el otro jugador, **le quitas una accion en su siguiente turno**. Esta penalizacion solo puede aplicarse **una vez por turno**.
-- Si hay un **empate** al final del juego, se añade **un turno adicional**.
+- Si hay un **empate** al final del juego, se agrega **un turno adicional**.
 
 ---
 

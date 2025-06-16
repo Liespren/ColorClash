@@ -104,7 +104,7 @@ void Sistema::imprimirEstadoTablero() {
 
     if (turnoActual >= maxTurnos) {
         if (puntosRojo == puntosAzul) {
-            cout << "\nEmpate! Se añade un turno adicional.\n";
+            cout << "\nEmpate! Se agrega un turno adicional.\n";
             maxTurnos++;
         } else {
             cout << "\n=== Juego terminado ===\n";
@@ -346,19 +346,13 @@ char Sistema::obtenerColorCasilla(int fila, int col) const {
 void Sistema::ejecutarTurnoIA(Jugador& jugador) {
     cout << "\nTurno IA (" << jugador.getNombre() << ")" << endl;
 
-    // Aplicar penalizacion si corresponde
+    // Aplicar penalización si corresponde
     if (jugador.getPenalizaciones() > 0) {
         cout << jugador.getNombre() << " tiene una penalizacion y pierde 1 accion este turno.\n";
         jugador.setAcciones(1);
         jugador.setPenalizaciones(0);
     } else {
-        // Si es el ultimo turno (turno 5), solo dar 1 accion
-        if (turnoActual == maxTurnos) {
-            cout << "Ultimo turno! IA tiene solo 1 accion.\n";
-            jugador.setAcciones(1);
-        } else {
-            jugador.setAcciones(2);
-        }
+        jugador.setAcciones(2);
     }
 
     while (jugador.getAcciones() > 0) {
@@ -372,7 +366,6 @@ void Sistema::ejecutarTurnoIA(Jugador& jugador) {
                 } else if (jugadorEnCasilla == &jugador2) {
                     tableroIA[i][j] = 2;
                 } else {
-                    // Si no hay jugador, usar el color de la casilla
                     string color = tablero[i][j].getColor();
                     if (color == jugador1.getColor()) {
                         tableroIA[i][j] = 1;
@@ -389,108 +382,104 @@ void Sistema::ejecutarTurnoIA(Jugador& jugador) {
         int jugadorId = (&jugador == &jugador1) ? 1 : 2;
         Movimiento mejorMov = ia.obtener_mejor_movimiento(tableroIA, jugadorId);
 
-        // Ejecutar el movimiento
-        if (mejorMov.fila != -1 && mejorMov.columna != -1) {
-            // Encontrar la casilla actual del jugador
-            Casilla* casillaActual = nullptr;
-            int filaActual = -1, colActual = -1;
-            
-            for (int i = 0; i < 5; ++i) {
-                for (int j = 0; j < 5; ++j) {
-                    if (tablero[i][j].getJugador() == &jugador) {
-                        casillaActual = &tablero[i][j];
-                        filaActual = i;
-                        colActual = j;
+        if (mejorMov.fila == -1 || mejorMov.columna == -1) {
+            cout << "No hay movimientos validos disponibles.\n";
+            break;
+        }
+
+        // Encontrar la casilla actual del jugador
+        Casilla* casillaActual = nullptr;
+        int filaActual = -1, colActual = -1;
+        
+        for (int i = 0; i < 5; ++i) {
+            for (int j = 0; j < 5; ++j) {
+                if (tablero[i][j].getJugador() == &jugador) {
+                    casillaActual = &tablero[i][j];
+                    filaActual = i;
+                    colActual = j;
+                    break;
+                }
+            }
+            if (casillaActual) break;
+        }
+
+        if (!casillaActual) {
+            cout << "Error: IA no encontrada en el tablero.\n";
+            break;
+        }
+
+        bool accionRealizada = false;
+
+        // Calcular la dirección hacia la casilla objetivo
+        int difFila = mejorMov.fila - filaActual;
+        int difCol = mejorMov.columna - colActual;
+        char dir = ' ';
+
+        // Determinar la dirección principal
+        if (abs(difFila) > abs(difCol)) {
+            dir = (difFila > 0) ? 'D' : 'U';
+        } else {
+            dir = (difCol > 0) ? 'R' : 'L';
+        }
+
+        // Intentar realizar la acción
+        if (mejorMov.es_pintura) {
+            if (pintarCasilla(jugador, dir)) {
+                cout << "IA pinto una casilla.\n";
+                // Verificar si se pintó a un jugador
+                Casilla* casillaPintada = obtenerCasillaEnDireccion(jugador, dir);
+                if (casillaPintada != nullptr) {
+                    Jugador* jugadorEnCasilla = casillaPintada->getJugador();
+                    if (jugadorEnCasilla != nullptr && jugadorEnCasilla != &jugador) {
+                        jugadorEnCasilla->incrementarPenalizaciones(1);
+                        cout << "El rival " << jugadorEnCasilla->getNombre()
+                             << " fue pintado en su casilla! Pierde 1 accion en su proximo turno.\n";
+                    }
+                }
+                accionRealizada = true;
+            } else {
+                // Si falla, intentar otras direcciones
+                const char direcciones[] = {'U', 'D', 'L', 'R'};
+                for (char dirAlt : direcciones) {
+                    if (dirAlt != dir && pintarCasilla(jugador, dirAlt)) {
+                        cout << "IA pinto una casilla en direccion alternativa.\n";
+                        // Verificar si se pintó a un jugador
+                        Casilla* casillaPintada = obtenerCasillaEnDireccion(jugador, dirAlt);
+                        if (casillaPintada != nullptr) {
+                            Jugador* jugadorEnCasilla = casillaPintada->getJugador();
+                            if (jugadorEnCasilla != nullptr && jugadorEnCasilla != &jugador) {
+                                jugadorEnCasilla->incrementarPenalizaciones(1);
+                                cout << "El rival " << jugadorEnCasilla->getNombre()
+                                     << " fue pintado en su casilla! Pierde 1 accion en su proximo turno.\n";
+                            }
+                        }
+                        accionRealizada = true;
                         break;
                     }
                 }
-                if (casillaActual) break;
             }
-
-            if (casillaActual) {
-                bool accionRealizada = false;
-
-                // Si es una accion de pintar
-                if (mejorMov.es_pintura) {
-                    // Calcular la direccion hacia la casilla objetivo
-                    int difFila = mejorMov.fila - filaActual;
-                    int difCol = mejorMov.columna - colActual;
-                    char dir = ' ';
-
-                    // Determinar la direccion principal
-                    if (abs(difFila) > abs(difCol)) {
-                        dir = (difFila > 0) ? 'D' : 'U';
-                    } else {
-                        dir = (difCol > 0) ? 'R' : 'L';
-                    }
-
-                    // Intentar pintar en la direccion calculada
-                    if (pintarCasilla(jugador, dir)) {
-                        cout << "IA pinto una casilla.\n";
+        } else {
+            if (moverJugador(jugador, dir)) {
+                cout << "IA se movio.\n";
+                accionRealizada = true;
+            } else {
+                // Si falla, intentar otras direcciones
+                const char direcciones[] = {'U', 'D', 'L', 'R'};
+                for (char dirAlt : direcciones) {
+                    if (dirAlt != dir && moverJugador(jugador, dirAlt)) {
+                        cout << "IA se movio en direccion alternativa.\n";
                         accionRealizada = true;
-                    } else {
-                        // Si falla, intentar otras direcciones
-                        const char direcciones[] = {'U', 'D', 'L', 'R'};
-                        for (char dirAlt : direcciones) {
-                            if (dirAlt != dir) {
-                                if (pintarCasilla(jugador, dirAlt)) {
-                                    cout << "IA pinto una casilla en direccion alternativa.\n";
-                                    accionRealizada = true;
-                                    break;
-                                }
-                            }
-                        }
+                        break;
                     }
-                } else {
-                    // Es un movimiento
-                    int difFila = mejorMov.fila - filaActual;
-                    int difCol = mejorMov.columna - colActual;
-                    char dir = ' ';
-
-                    if (difFila != 0 && difCol != 0) {
-                        // Movimiento diagonal: intentar primero la direccion con mayor diferencia
-                        if (abs(difFila) > abs(difCol)) {
-                            dir = (difFila > 0) ? 'D' : 'U';
-                        } else {
-                            dir = (difCol > 0) ? 'R' : 'L';
-                        }
-                    } else {
-                        // Movimiento horizontal o vertical
-                        if (difFila != 0) {
-                            dir = (difFila > 0) ? 'D' : 'U';
-                        } else {
-                            dir = (difCol > 0) ? 'R' : 'L';
-                        }
-                    }
-
-                    // Intentar mover en la direccion calculada
-                    if (moverJugador(jugador, dir)) {
-                        cout << "IA se movio.\n";
-                        accionRealizada = true;
-                    } else {
-                        // Si falla, intentar otras direcciones
-                        const char direcciones[] = {'U', 'D', 'L', 'R'};
-                        for (char dirAlt : direcciones) {
-                            if (dirAlt != dir) {
-                                if (moverJugador(jugador, dirAlt)) {
-                                    cout << "IA se movio en direccion alternativa.\n";
-                                    accionRealizada = true;
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                }
-
-                if (accionRealizada) {
-                    jugador.setAcciones(jugador.getAcciones() - 1);
-                    cout << "Acciones restantes: " << jugador.getAcciones() << endl;
                 }
             }
         }
-        // Si no hay movimientos validos, terminar el turno
-        if (mejorMov.fila == -1 || mejorMov.columna == -1) {
-            cout << "No hay movimientos validos disponibles.\n";
+
+        if (accionRealizada) {
+            jugador.setAcciones(jugador.getAcciones() - 1);
+            cout << "Acciones restantes: " << jugador.getAcciones() << endl;
+        } else {
+            cout << "No se pudo realizar ninguna accion.\n";
             break;
         }
     }
