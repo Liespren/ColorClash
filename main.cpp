@@ -23,7 +23,7 @@ int main() {
                 juego.ejecutarTurno();
             }
 
-            // Limpiar cualquier enter pendiente del flujo después del juego
+            // Limpiar cualquier enter pendiente del flujo despues del juego
             cin.clear();
             cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 

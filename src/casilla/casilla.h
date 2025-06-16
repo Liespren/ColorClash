@@ -1,6 +1,6 @@
 #pragma once
 #include <string>
-#include "../jugador/jugador.h"  // Incluye la definición de Jugador
+#include "../jugador/jugador.h"  // Incluye la definicion de Jugador
 
 using std::string;
 
@@ -15,7 +15,7 @@ private:
 
 public:
     Casilla();
-    Casilla(const string& color, Jugador* jugador);  // Cambia el parámetro
+    Casilla(const string& color, Jugador* jugador);  // Cambia el parametro
 
     void setColor(const string& nuevoColor);
     void setJugador(Jugador* nuevoJugador);  // Cambia el tipo

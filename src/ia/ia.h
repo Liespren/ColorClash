@@ -11,7 +11,7 @@ const int NUM_COLUMNAS = 5;
 struct Movimiento {
     int fila;
     int columna;
-    bool es_pintura;  // true si es una acción de pintar, false si es mover
+    bool es_pintura;  // true si es una accion de pintar, false si es mover
 
     Movimiento(int f, int c, bool p = false) : fila(f), columna(c), es_pintura(p) {}
 };

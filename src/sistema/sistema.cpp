@@ -287,7 +287,7 @@ Casilla* Sistema::obtenerCasillaEnDireccion(Jugador& jugador, char dir) {
     int filaJugador = -1;
     int colJugador = -1;
 
-    // Buscar la posición actual del jugador en el tablero
+    // Buscar la posicion actual del jugador en el tablero
     for (int i = 0; i < 5; ++i) {
         for (int j = 0; j < 5; ++j) {
             if (tablero[i][j].getJugador() == &jugador) {
@@ -303,7 +303,7 @@ Casilla* Sistema::obtenerCasillaEnDireccion(Jugador& jugador, char dir) {
         return nullptr;  // No se encontró al jugador
     }
 
-    // Calcular la dirección
+    // Calcular la direccion
     int nuevaFila = filaJugador;
     int nuevaCol = colJugador;
 
@@ -315,12 +315,12 @@ Casilla* Sistema::obtenerCasillaEnDireccion(Jugador& jugador, char dir) {
         default: return nullptr;
     }
 
-    // Validar límites del tablero
+    // Validar limites del tablero
     if (nuevaFila >= 0 && nuevaFila < 5 && nuevaCol >= 0 && nuevaCol < 5) {
         return &tablero[nuevaFila][nuevaCol];
     }
 
-    return nullptr;  // Dirección fuera de los límites
+    return nullptr;  // Dirección fuera de los limites
 }
 
 bool Sistema::juegoTerminado() const {
@@ -346,15 +346,15 @@ char Sistema::obtenerColorCasilla(int fila, int col) const {
 void Sistema::ejecutarTurnoIA(Jugador& jugador) {
     cout << "\nTurno IA (" << jugador.getNombre() << ")" << endl;
 
-    // Aplicar penalización si corresponde
+    // Aplicar penalizacion si corresponde
     if (jugador.getPenalizaciones() > 0) {
         cout << jugador.getNombre() << " tiene una penalizacion y pierde 1 accion este turno.\n";
         jugador.setAcciones(1);
         jugador.setPenalizaciones(0);
     } else {
-        // Si es el último turno (turno 5), solo dar 1 acción
+        // Si es el ultimo turno (turno 5), solo dar 1 accion
         if (turnoActual == maxTurnos) {
-            cout << "Último turno! IA tiene solo 1 acción.\n";
+            cout << "Ultimo turno! IA tiene solo 1 accion.\n";
             jugador.setAcciones(1);
         } else {
             jugador.setAcciones(2);
@@ -410,23 +410,23 @@ void Sistema::ejecutarTurnoIA(Jugador& jugador) {
             if (casillaActual) {
                 bool accionRealizada = false;
 
-                // Si es una acción de pintar
+                // Si es una accion de pintar
                 if (mejorMov.es_pintura) {
-                    // Calcular la dirección hacia la casilla objetivo
+                    // Calcular la direccion hacia la casilla objetivo
                     int difFila = mejorMov.fila - filaActual;
                     int difCol = mejorMov.columna - colActual;
                     char dir = ' ';
 
-                    // Determinar la dirección principal
+                    // Determinar la direccion principal
                     if (abs(difFila) > abs(difCol)) {
                         dir = (difFila > 0) ? 'D' : 'U';
                     } else {
                         dir = (difCol > 0) ? 'R' : 'L';
                     }
 
-                    // Intentar pintar en la dirección calculada
+                    // Intentar pintar en la direccion calculada
                     if (pintarCasilla(jugador, dir)) {
-                        cout << "IA pintó una casilla.\n";
+                        cout << "IA pinto una casilla.\n";
                         accionRealizada = true;
                     } else {
                         // Si falla, intentar otras direcciones
@@ -434,7 +434,7 @@ void Sistema::ejecutarTurnoIA(Jugador& jugador) {
                         for (char dirAlt : direcciones) {
                             if (dirAlt != dir) {
                                 if (pintarCasilla(jugador, dirAlt)) {
-                                    cout << "IA pintó una casilla en dirección alternativa.\n";
+                                    cout << "IA pinto una casilla en direccion alternativa.\n";
                                     accionRealizada = true;
                                     break;
                                 }
@@ -448,7 +448,7 @@ void Sistema::ejecutarTurnoIA(Jugador& jugador) {
                     char dir = ' ';
 
                     if (difFila != 0 && difCol != 0) {
-                        // Movimiento diagonal: intentar primero la dirección con mayor diferencia
+                        // Movimiento diagonal: intentar primero la direccion con mayor diferencia
                         if (abs(difFila) > abs(difCol)) {
                             dir = (difFila > 0) ? 'D' : 'U';
                         } else {
@@ -463,9 +463,9 @@ void Sistema::ejecutarTurnoIA(Jugador& jugador) {
                         }
                     }
 
-                    // Intentar mover en la dirección calculada
+                    // Intentar mover en la direccion calculada
                     if (moverJugador(jugador, dir)) {
-                        cout << "IA se movió.\n";
+                        cout << "IA se movio.\n";
                         accionRealizada = true;
                     } else {
                         // Si falla, intentar otras direcciones
@@ -473,7 +473,7 @@ void Sistema::ejecutarTurnoIA(Jugador& jugador) {
                         for (char dirAlt : direcciones) {
                             if (dirAlt != dir) {
                                 if (moverJugador(jugador, dirAlt)) {
-                                    cout << "IA se movió en dirección alternativa.\n";
+                                    cout << "IA se movio en direccion alternativa.\n";
                                     accionRealizada = true;
                                     break;
                                 }
@@ -488,9 +488,9 @@ void Sistema::ejecutarTurnoIA(Jugador& jugador) {
                 }
             }
         }
-        // Si no hay movimientos válidos, terminar el turno
+        // Si no hay movimientos validos, terminar el turno
         if (mejorMov.fila == -1 || mejorMov.columna == -1) {
-            cout << "No hay movimientos válidos disponibles.\n";
+            cout << "No hay movimientos validos disponibles.\n";
             break;
         }
     }
