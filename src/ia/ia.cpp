@@ -1,4 +1,4 @@
-#include "IA.h"
+#include "ia.h"
 #include <algorithm>
 #include <random>
 #include <chrono>
