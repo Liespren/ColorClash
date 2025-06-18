@@ -56,7 +56,7 @@ ColorClash/
 
 ## Compilacion
 
-g++ -o ColorClash main.cpp src/sistema/sistema.cpp src/jugador/jugador.cpp src/casilla/casilla.cpp src/ia/ia.cpp -std=c++11
+g++ -o ColorClash.exe main.cpp src/sistema/sistema.cpp src/jugador/jugador.cpp src/casilla/casilla.cpp src/ia/ia.cpp -std=c++11
 
 ---
 
