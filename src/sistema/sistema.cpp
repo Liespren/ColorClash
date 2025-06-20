@@ -1,3 +1,21 @@
+/*
+ * SISTEMA.CPP - IMPLEMENTACIÓN DEL CONTROLADOR PRINCIPAL
+ * 
+ * DESCRIPCIÓN:
+ * Implementación de la clase Sistema que controla toda la lógica del juego.
+ * Incluye la inicialización del tablero, gestión de turnos, validación de
+ * movimientos y la interfaz de usuario.
+ * 
+ * FUNCIONALIDADES PRINCIPALES:
+ * - Inicialización del tablero con sistema de punteros
+ * - Gestión de turnos y acciones de jugadores
+ * - Validación y ejecución de movimientos
+ * - Sistema de pintura y penalizaciones
+ * - Visualización con colores ANSI
+ * - Integración con la IA
+ * 
+ */
+
 #include <iostream>
 #include "sistema.h"
 
@@ -22,33 +40,35 @@ Sistema::Sistema():
         for (int j = 0; j < 5; ++j)
             tablero[i][j] = Casilla("blanco", nullptr);
 
-    // Conectar punteros (nexos) entre casillas
+    // Conectar punteros (nexos) entre casillas para navegación eficiente
     for (int i = 0; i < 5; ++i) {
         for (int j = 0; j < 5; ++j) {
             if (i > 0)
-                tablero[i][j].setPtrU(&tablero[i - 1][j]);
+                tablero[i][j].setPtrU(&tablero[i - 1][j]);  // Puntero arriba
             if (i < 4)
-                tablero[i][j].setPtrD(&tablero[i + 1][j]);
+                tablero[i][j].setPtrD(&tablero[i + 1][j]);  // Puntero abajo
             if (j > 0)
-                tablero[i][j].setPtrL(&tablero[i][j - 1]);
+                tablero[i][j].setPtrL(&tablero[i][j - 1]);  // Puntero izquierda
             if (j < 4)
-                tablero[i][j].setPtrR(&tablero[i][j + 1]);
+                tablero[i][j].setPtrR(&tablero[i][j + 1]);  // Puntero derecha
         }
     }
 
     // Asignar posiciones iniciales a jugadores
-    tablero[1][1].setJugador(&jugador1);
+    tablero[1][1].setJugador(&jugador1);  // Jugador rojo en posición (1,1)
     tablero[1][1].setColor(jugador1.getColor());
 
-    tablero[3][3].setJugador(&jugador2);
+    tablero[3][3].setJugador(&jugador2);  // Jugador azul en posición (3,3)
     tablero[3][3].setColor(jugador2.getColor());
 }
 
+// Inicia el juego e imprime el estado inicial
 void Sistema::iniciarJuego() {
     cout << "Iniciando juego..." << endl;
     imprimirEstadoTablero();
 }
 
+// Habilita colores ANSI para Windows (necesario para mostrar colores en consola)
 void Sistema::habilitarColoresANSI() {
 #ifdef _WIN32
     HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -62,22 +82,26 @@ void Sistema::habilitarColoresANSI() {
 #endif
 }
 
+// Imprime el estado actual del tablero con colores y puntuaciones
 void Sistema::imprimirEstadoTablero() {
     habilitarColoresANSI();
 
     int puntosRojo = 0;
     int puntosAzul = 0;
 
+    // Imprimir coordenadas de columnas
     cout << "\n    ";
     for (int col = 0; col < 5; ++col) {
         cout << col << "     ";
     }
     cout << "\n  +-----+-----+-----+-----+-----+\n";
 
+    // Imprimir filas del tablero con colores
     for (int i = 0; i < 5; ++i) {
         cout << i << " |";
         for (int j = 0; j < 5; ++j) {
             string color = tablero[i][j].getColor();
+            // Contar puntos por color
             if (color == "rojo") puntosRojo++;
             else if (color == "azul") puntosAzul++;
 
@@ -87,7 +111,7 @@ void Sistema::imprimirEstadoTablero() {
                 contenido = "  " + jugadorEnCasilla->getNombre() + "  ";
             }
 
-            // Colorear fondo según el color de la casilla
+            // Aplicar colores ANSI según el color de la casilla
             if (color == "rojo")
                 cout << "\033[30;41m" << contenido << "\033[0m|";  // texto negro, fondo rojo
             else if (color == "azul")
@@ -98,10 +122,12 @@ void Sistema::imprimirEstadoTablero() {
         cout << "\n  +-----+-----+-----+-----+-----+\n";
     }
 
+    // Mostrar puntuaciones
     cout << "\nPuntaje:\n";
     cout << "Rojo (R): " << puntosRojo << " puntos\n";
     cout << "Azul (A): " << puntosAzul << " puntos\n";
 
+    // Verificar fin de juego o empate
     if (turnoActual >= maxTurnos) {
         if (puntosRojo == puntosAzul) {
             cout << "\nEmpate! Se agrega un turno adicional.\n";
@@ -116,10 +142,11 @@ void Sistema::imprimirEstadoTablero() {
     }
 }
 
+// Ejecuta un turno completo: jugador humano + IA
 void Sistema::ejecutarTurno() {
     cout << "\nTurno " << turnoActual << endl;
 
-    // Ejecutar acciones para jugador1 y jugador2, alternando turnos si quieres
+    // Ejecutar acciones para jugador humano y IA
     ejecutarAccionesJugador(jugador1);
     ejecutarTurnoIA(jugador2);
 
@@ -129,18 +156,20 @@ void Sistema::ejecutarTurno() {
     turnoActual++;
 }
 
+// Gestiona las acciones del jugador humano durante su turno
 void Sistema::ejecutarAccionesJugador(Jugador& jugador) {
-    // Aplicar penalización si corresponde
+    // Aplicar penalización si corresponde (por ser pintado en turno anterior)
     if (jugador.getPenalizaciones() > 0) {
         cout << jugador.getNombre() << " tiene una penalizacion y pierde 1 accion este turno.\n";
-        jugador.setAcciones(1);
-        jugador.setPenalizaciones(0);
+        jugador.setAcciones(1);  // Solo 1 acción en lugar de 2
+        jugador.setPenalizaciones(0);  // Resetear penalización
     } else {
-        jugador.setAcciones(2);
+        jugador.setAcciones(2);  // Acciones normales
     }
 
     cout << "\nTurno de " << jugador.getNombre() << endl;
 
+    // Bucle de acciones del jugador
     while (jugador.getAcciones() > 0) {
         cout << "Acciones restantes: " << jugador.getAcciones() << endl;
         cout << "1) Mover\n2) Pintar\nElige accion: ";
@@ -154,11 +183,12 @@ void Sistema::ejecutarAccionesJugador(Jugador& jugador) {
             cin >> opcion;
             opcion = tolower(opcion);
 
+            // Convertir WASD a direcciones internas
             switch (opcion) {
-                case 'w': dir = 'U'; break;
-                case 's': dir = 'D'; break;
-                case 'a': dir = 'L'; break;
-                case 'd': dir = 'R'; break;
+                case 'w': dir = 'U'; break;  // Arriba
+                case 's': dir = 'D'; break;  // Abajo
+                case 'a': dir = 'L'; break;  // Izquierda
+                case 'd': dir = 'R'; break;  // Derecha
                 default:
                     cout << "Direccion invalida. Intenta de nuevo.\n";
                     continue;
@@ -168,13 +198,14 @@ void Sistema::ejecutarAccionesJugador(Jugador& jugador) {
             continue;
         }
 
+        // Ejecutar la acción seleccionada
         bool exito = false;
         if (accion == "1") {
             exito = moverJugador(jugador, dir);
         } else if (accion == "2") {
             exito = pintarCasilla(jugador, dir);
 
-            // Si la pintura fue exitosa, verificamos si hay un jugador en esa casilla
+            // Verificar si se pintó al oponente (aplicar penalización)
             if (exito) {
                 Casilla* casillaPintada = obtenerCasillaEnDireccion(jugador, dir);
                 if (casillaPintada != nullptr) {
@@ -188,6 +219,7 @@ void Sistema::ejecutarAccionesJugador(Jugador& jugador) {
             }
         }
 
+        // Actualizar acciones restantes
         if (exito) {
             jugador.setAcciones(jugador.getAcciones() - 1);
         } else {
@@ -197,6 +229,7 @@ void Sistema::ejecutarAccionesJugador(Jugador& jugador) {
     }
 }
 
+// Mueve un jugador en la dirección especificada
 bool Sistema::moverJugador(Jugador& jugador, char dir) {
     // Encontrar la casilla actual del jugador
     Casilla* casillaActual = nullptr;
@@ -237,6 +270,7 @@ bool Sistema::moverJugador(Jugador& jugador, char dir) {
     return true;
 }
 
+// Pinta una casilla adyacente en la dirección especificada
 bool Sistema::pintarCasilla(Jugador& jugador, char dir) {
     // Encontrar la casilla actual del jugador
     Casilla* casillaActual = nullptr;
@@ -283,6 +317,7 @@ bool Sistema::pintarCasilla(Jugador& jugador, char dir) {
     return true;
 }
 
+// Obtiene la casilla adyacente en la dirección especificada
 Casilla* Sistema::obtenerCasillaEnDireccion(Jugador& jugador, char dir) {
     int filaJugador = -1;
     int colJugador = -1;
@@ -323,10 +358,12 @@ Casilla* Sistema::obtenerCasillaEnDireccion(Jugador& jugador, char dir) {
     return nullptr;  // Dirección fuera de los limites
 }
 
+// Verifica si el juego ha terminado
 bool Sistema::juegoTerminado() const {
     return turnoActual > maxTurnos;
 }
 
+// Obtiene el color de una casilla específica
 char Sistema::obtenerColorCasilla(int fila, int col) const {
     Jugador* jugador = tablero[fila][col].getJugador();
     if (jugador != nullptr) {
@@ -343,6 +380,7 @@ char Sistema::obtenerColorCasilla(int fila, int col) const {
     return ' ';  // Casilla sin color ni jugador
 }
 
+// Ejecuta el turno de la IA
 void Sistema::ejecutarTurnoIA(Jugador& jugador) {
     cout << "\nTurno IA (" << jugador.getNombre() << ")" << endl;
 
@@ -484,4 +522,3 @@ void Sistema::ejecutarTurnoIA(Jugador& jugador) {
         }
     }
 }
-
