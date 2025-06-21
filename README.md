@@ -6,9 +6,9 @@
 
 ## Autor
 
-Kevin Silva Ossandón
-Estudiante de Ingeniería en Tecnolgías de Información, Universidad Católica del Norte  
-Proyecto de Estructura de Datos
+- Kevin Silva Ossandón
+- Estudiante de Ingeniería en Tecnolgías de Información, Universidad Católica del Norte  
+- Proyecto de Estructura de Datos
 
 ---
 
