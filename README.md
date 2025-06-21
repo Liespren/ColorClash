@@ -46,14 +46,14 @@ ColorClash/
 │   ├── sistema/          # Lógica principal del juego
 │   ├── jugador/          # Clase Jugador
 │   ├── casilla/          # Clase Casilla del tablero
-│   └── ia/               # Inteligencia artificial (minimax)
+│   └── ia/               # Inteligencia artificial
 ```
 
 ---
 
 ## Características
 
-- **Juego por turnos** con 2 jugadores
+- **Juego por turnos** con 2 jugadores (jugador, ia)
 - **IA inteligente** usando algoritmo minimax con poda alfa-beta
 - **Sistema de penalizaciones** por pintar al oponente
 - **Tablero 5x5** con navegación eficiente usando punteros
